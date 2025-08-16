@@ -1,4 +1,4 @@
-import mongoose, { Schema, models, model } from 'mongoose'
+import mongoose, { Schema, models, model, Model } from 'mongoose'
 
 export interface IIngredient {
   name: string
@@ -44,4 +44,5 @@ const RecipeSchema = new Schema<IRecipe>({
   sourceUrl: { type: String },
 }, { timestamps: true })
 
-export default models.Recipe || model<IRecipe>('Recipe', RecipeSchema)
+const RecipeModel: Model<IRecipe> = (models.Recipe as Model<IRecipe>) || model<IRecipe>('Recipe', RecipeSchema)
+export default RecipeModel

@@ -19,9 +19,13 @@ interface HeroProps {
 const Hero = ({ setActiveTab }: HeroProps) => {
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 }
+    animate: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.6 }  // Moved inside animate
+    }
   }
+  
 
   const staggerContainer = {
     initial: {},
