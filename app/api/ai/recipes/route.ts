@@ -161,7 +161,18 @@ export async function POST(req: Request) {
     }
     const client = new GeminiClient(GEMINI_API_KEY)
     try {
-      const text = await client.chat(prompt)
+      let text = await client.chat(prompt)
+      // Clean up the response text
+      // 1. Remove markdown code blocks if present
+      text = text.replace(/^```(?:json)?\s*([\s\S]*?)\s*```$/g, '$1')
+      // 2. Remove any leading/trailing whitespace
+      text = text.trim()
+      // 3. Remove any non-JSON content before or after the JSON array
+      const jsonMatch = text.match(/\[\s*\{.*\}\s*\]/s)
+      if (jsonMatch) {
+        text = jsonMatch[0]
+      }
+      console.log('Processed text before JSON parse:', text)
       if (typeof text !== 'string') throw new Error('Gemini API did not return a string')
       if (text) aiJson = JSON.parse(text)
     } catch (e: any) {
