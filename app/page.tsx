@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-type TabType = 'home' | 'meals' | 'recipes' | 'shakes' | 'stats'
+type TabType = 'home' | 'meals' | 'recipes' | 'stats'
 
 import { 
   Search, 
@@ -23,12 +23,10 @@ import {
   ArrowUpRight,
   ChevronRight
 } from 'lucide-react'
-import Navigation from './components/Navigation'
 import Hero from './components/Hero'
 import MealSearch from './components/MealSearch'
 import MealPlan from './components/MealPlan'
 import Recipes from './components/Recipes'
-import ProteinShakes from './components/ProteinShakes'
 import Stats from './components/Stats'
 import LoadingSpinner from './components/LoadingSpinner'
 
@@ -122,8 +120,6 @@ export default function Home() {
         return <MealSearch />
       case 'recipes':
         return <Recipes />
-      case 'shakes':
-        return <ProteinShakes />
       case 'stats':
         return <Stats />
       default:
@@ -133,8 +129,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation activeTab={activeTab} setActiveTab={handleTabChange} />
-      
       {/* Loading Overlay */}
       <AnimatePresence>
         {isLoading && (
@@ -152,9 +146,7 @@ export default function Home() {
       
       {/* Main Content */}
       <motion.main
-        className={`min-h-screen transition-all duration-300 ${
-          activeTab === 'home' ? 'pt-0' : 'pt-24 md:pt-28'
-        }`}
+        className="min-h-screen transition-all duration-300"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -221,7 +213,7 @@ export default function Home() {
                       aria-label="View and manage your meals"
                       aria-current={isMealsActive ? 'page' : undefined}
                     >
-<Plus size={18} aria-hidden="true" />
+                      <Plus size={18} aria-hidden="true" />
                       <span>Add Meal</span>
                     </button>
                   </div>

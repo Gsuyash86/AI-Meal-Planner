@@ -1,3 +1,5 @@
+'use client'
+
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Search, 
@@ -11,19 +13,23 @@ import {
   UserCircle,
   Settings
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useMemo } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { useSession, signIn, signOut } from 'next-auth/react'
 
 interface NavigationProps {
-  activeTab: string
-  setActiveTab: (tab: string) => void
+  activeTab?: string
+  setActiveTab?: (tab: string) => void
 }
 
-const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
+const Navigation = ({ activeTab: propActive, setActiveTab: propSetActive }: NavigationProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const router = useRouter()
+  const pathname = usePathname()
+  const { data: session, status } = useSession()
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
@@ -33,6 +39,49 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
     { id: 'shakes', label: 'Protein Shakes', icon: ChefHat },
     { id: 'stats', label: 'Analytics', icon: TrendingUp },
   ]
+
+  // Derive active tab from route when props not provided
+  const tabFromPath = useMemo(() => {
+    if (!pathname) return 'home'
+    if (pathname.startsWith('/meal-plan')) return 'plan'
+    if (pathname.startsWith('/recipes')) return 'recipes'
+    if (pathname.startsWith('/profile')) return 'home'
+    if (pathname.startsWith('/shakes')) return 'shakes'
+    return pathname === '/' ? 'home' : 'home'
+  }, [pathname])
+  const [internalActive, setInternalActive] = useState(tabFromPath)
+  useEffect(() => setInternalActive(tabFromPath), [tabFromPath])
+  const activeTab = propActive ?? internalActive
+
+  // Map tabs to routes (only known ones push routes)
+  const pushRouteForTab = (tab: string) => {
+    switch (tab) {
+      case 'home':
+        router.push('/')
+        break
+      case 'plan':
+        router.push('/meal-plan')
+        break
+      case 'recipes':
+        router.push('/recipes')
+        break
+      case 'search':
+        router.push('/')
+        break
+      case 'shakes':
+        router.push('/shakes')
+        break
+      // Optional: add routes for stats etc.
+      default:
+        break
+    }
+  }
+
+  const handleSetActive = (tab: string) => {
+    propSetActive?.(tab)
+    setInternalActive(tab)
+    pushRouteForTab(tab)
+  }
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -65,7 +114,7 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
               className="flex items-center space-x-3 cursor-pointer"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setActiveTab('home')}
+              onClick={() => handleSetActive('home')}
             >
               <div className="w-10 h-10 bg-cred-gradient rounded-xl flex items-center justify-center shadow-lg">
                 <ChefHat size={22} className="text-white" />
@@ -82,7 +131,7 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
                 return (
                   <motion.button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => handleSetActive(item.id)}
                     className={`px-4 py-2.5 rounded-xl font-medium transition-all duration-300 relative group ${
                       isActive 
                         ? 'text-white' 
@@ -121,24 +170,28 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
               <motion.div 
                 className="relative"
               >
-                <button 
-                  type="button"
-                  className="flex items-center gap-2 text-text-secondary hover:text-white transition-colors"
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  aria-label="User profile menu"
-                  aria-haspopup="true"
-                  aria-expanded={isProfileOpen ? 'true' : 'false'}
-                  aria-controls="profile-menu"
-                  id="profile-menu-button"
-                  title="Open profile menu"
-                >
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cred-purple to-cred-pink flex items-center justify-center text-white">
-                    <UserCircle size={20} />
-                  </div>
-                </button>
+                {status === 'authenticated' ? (
+                  <button 
+                    type="button"
+                    className="flex items-center gap-2 text-text-secondary hover:text-white transition-colors"
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    aria-label="User profile menu"
+                    aria-haspopup="true"
+                    aria-expanded={isProfileOpen}
+                    aria-controls="profile-menu"
+                    id="profile-menu-button"
+                    title="Open profile menu"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cred-purple to-cred-pink flex items-center justify-center text-white">
+                      <UserCircle size={20} />
+                    </div>
+                  </button>
+                ) : (
+                  <Link href="/login" className="btn btn-primary">Sign In</Link>
+                )}
                 
                 <AnimatePresence>
-                  {isProfileOpen && (
+                  {isProfileOpen && status === 'authenticated' && (
                     <motion.div 
                       id="profile-menu"
                       className="absolute right-0 mt-2 w-48 bg-dark-card border border-dark-border rounded-xl shadow-xl overflow-hidden"
@@ -148,14 +201,13 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="p-4 border-b border-dark-border">
-                        <p className="font-medium">John Doe</p>
-                        <p className="text-sm text-text-secondary">john@example.com</p>
+                        <p className="font-medium">{session?.user?.name || 'Account'}</p>
+                        <p className="text-sm text-text-secondary">{session?.user?.email}</p>
                       </div>
                       <div className="p-2">
-                        <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-dark-hover text-sm transition-colors">
-                          Profile Settings
-                        </button>
-                        <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-dark-hover text-sm transition-colors">
+                        <Link href="/profile" className="block px-4 py-2 rounded-lg hover:bg-dark-hover text-sm transition-colors">Profile</Link>
+                        <Link href="/recipes" className="block px-4 py-2 rounded-lg hover:bg-dark-hover text-sm transition-colors">My Recipes</Link>
+                        <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-dark-hover text-sm transition-colors" onClick={() => signOut({ callbackUrl: '/' })}>
                           Sign Out
                         </button>
                       </div>
@@ -164,13 +216,16 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
                 </AnimatePresence>
               </motion.div>
               
-              <motion.button 
-                className="btn btn-primary ml-2"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                Upgrade
-              </motion.button>
+              {status !== 'authenticated' && (
+                <motion.button 
+                  className="btn btn-primary ml-2"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => router.push('/register')}
+                >
+                  Get Started
+                </motion.button>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -201,7 +256,7 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
                   return (
                     <motion.button
                       key={item.id}
-                      onClick={() => setActiveTab(item.id)}
+                      onClick={() => handleSetActive(item.id)}
                       className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition-all duration-300 ${
                         isActive
                           ? 'bg-cred-purple/20 text-white'
@@ -219,16 +274,21 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
                 })}
                 
                 <div className="pt-2 mt-2 border-t border-dark-border">
-                  <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-text-secondary hover:bg-dark-hover hover:text-white transition-colors">
-                    <span className="font-medium">Settings</span>
-                    <Settings size={18} />
-                  </button>
-                  <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-text-secondary hover:bg-dark-hover hover:text-white transition-colors">
-                    <span className="font-medium">Sign Out</span>
-                    <span className="w-6 h-6 rounded-full bg-gradient-to-br from-cred-purple to-cred-pink flex items-center justify-center text-white">
-                      <UserCircle size={14} />
-                    </span>
-                  </button>
+                  {status === 'authenticated' ? (
+                    <button className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-text-secondary hover:bg-dark-hover hover:text-white transition-colors" onClick={() => signOut({ callbackUrl: '/' })}>
+                      <span className="font-medium">Sign Out</span>
+                      <span className="w-6 h-6 rounded-full bg-gradient-to-br from-cred-purple to-cred-pink flex items-center justify-center text-white">
+                        <UserCircle size={14} />
+                      </span>
+                    </button>
+                  ) : (
+                    <Link href="/login" className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-text-secondary hover:bg-dark-hover hover:text-white transition-colors">
+                      <span className="font-medium">Sign In</span>
+                      <span className="w-6 h-6 rounded-full bg-gradient-to-br from-cred-purple to-cred-pink flex items-center justify-center text-white">
+                        <UserCircle size={14} />
+                      </span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -251,7 +311,7 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
             return (
               <motion.button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => handleSetActive(item.id)}
                 className={`flex flex-col items-center p-2 rounded-xl transition-all duration-300 relative ${
                   isActive 
                     ? 'text-cred-cyan' 

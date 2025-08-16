@@ -1,7 +1,9 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import ErrorBoundary from './components/ErrorBoundary'
+import Providers from './providers'
+import Navigation from './components/Navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -10,7 +12,11 @@ export const metadata: Metadata = {
   description: 'AI-powered meal planning with personalized nutrition recommendations. Track calories, discover recipes, and achieve your health goals.',
   keywords: ['meal planning', 'nutrition', 'AI', 'healthy eating', 'protein shakes', 'recipes'],
   authors: [{ name: 'AI MealPro Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -21,9 +27,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-background text-foreground min-h-screen`}>
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
+        <Providers>
+          <ErrorBoundary>
+            <Navigation />
+            <main className="min-h-screen pt-24 md:pt-28 pb-16">
+              {children}
+            </main>
+          </ErrorBoundary>
+        </Providers>
       </body>
     </html>
   )

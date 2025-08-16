@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from 'framer-motion'
 import { Zap, Clock, Target, Star, Play, ExternalLink } from 'lucide-react'
 

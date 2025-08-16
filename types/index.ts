@@ -81,3 +81,36 @@ export interface Meal {
     dietaryPreferences: string[]
     allergies: string[]
   }
+
+  export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack'
+
+  export interface MealEntry {
+    recipeId?: string
+    name?: string
+    calories?: number
+    protein?: number
+    carbs?: number
+    fat?: number
+    ingredients?: string[]
+    time?: string
+  }
+
+  export interface DayEntry {
+    date: string
+    meals: Record<MealSlot, MealEntry[]>
+    totals: {
+      calories: number
+      protein: number
+      carbs: number
+      fat: number
+    }
+  }
+
+  export interface MealPlanDoc {
+    _id: string
+    userId: string
+    weekStart: string
+    days: DayEntry[]
+    createdAt?: string
+    updatedAt?: string
+  }
