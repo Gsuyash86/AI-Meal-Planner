@@ -11,7 +11,8 @@ import {
   Home,
   BookOpen,
   UserCircle,
-  Settings
+  Settings,
+  Sparkles
 } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
@@ -33,11 +34,10 @@ const Navigation = ({ activeTab: propActive, setActiveTab: propSetActive }: Navi
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'search', label: 'AI Search', icon: Search },
-    { id: 'plan', label: 'Meal Plan', icon: Target },
+    { id: 'ai', label: 'AI Discovery', icon: Sparkles },
+    { id: 'plan', label: 'Plan', icon: Target },
     { id: 'recipes', label: 'Recipes', icon: BookOpen },
-    { id: 'shakes', label: 'Protein Shakes', icon: ChefHat },
-    { id: 'stats', label: 'Analytics', icon: TrendingUp },
+    { id: 'shakes', label: 'Shakes', icon: ChefHat },
   ]
 
   // Derive active tab from route when props not provided
@@ -47,6 +47,7 @@ const Navigation = ({ activeTab: propActive, setActiveTab: propSetActive }: Navi
     if (pathname.startsWith('/recipes')) return 'recipes'
     if (pathname.startsWith('/profile')) return 'home'
     if (pathname.startsWith('/shakes')) return 'shakes'
+    if (pathname.startsWith('/ai')) return 'ai'
     return pathname === '/' ? 'home' : 'home'
   }, [pathname])
   const [internalActive, setInternalActive] = useState(tabFromPath)
@@ -65,11 +66,11 @@ const Navigation = ({ activeTab: propActive, setActiveTab: propSetActive }: Navi
       case 'recipes':
         router.push('/recipes')
         break
-      case 'search':
-        router.push('/')
-        break
       case 'shakes':
         router.push('/shakes')
+        break
+      case 'ai':
+        router.push('/ai')
         break
       // Optional: add routes for stats etc.
       default:
@@ -126,7 +127,7 @@ const Navigation = ({ activeTab: propActive, setActiveTab: propSetActive }: Navi
             
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-1">
-              {navItems.slice(1).map((item) => {
+              {navItems.map((item) => {
                 const isActive = activeTab === item.id
                 return (
                   <motion.button

@@ -154,14 +154,25 @@ export async function POST(req: Request) {
       "youtubeUrl": string | null,
       "sourceUrl": string | null
     }`;
-    const prompt = `${task}\n${format}\nRules:\n- If numeric macros unknown, use null.\n- Prefer concise steps.\n- imageUrl should be a representative image if available.`
+    const prompt = `${task}\n${format}\nRules:\n- Recipe must have macros and verified source.\n- Prefer concise steps.\n- imageUrl should be a representative image if available.`
 
     if (!GEMINI_API_KEY) {
       return NextResponse.json({ error: sourceUrl ? 'Could not parse recipe from URL and no AI key configured.' : 'Provide GEMINI_API_KEY or a recipe URL.' }, { status: 400 })
     }
     const client = new GeminiClient(GEMINI_API_KEY)
     try {
-      const text = await client.chat(prompt)
+      let text = await client.chat(prompt)
+      // Clean up the response text
+      // 1. Remove markdown code blocks if present
+      text = text.replace(/^```(?:json)?\s*([\s\S]*?)\s*```$/g, '$1')
+      // 2. Remove any leading/trailing whitespace
+      text = text.trim()
+      // 3. Remove any non-JSON content before or after the JSON array
+      const jsonMatch = text.match(/\[\s*\{.*\}\s*\]/s)
+      if (jsonMatch) {
+        text = jsonMatch[0]
+      }
+      console.log('Processed text before JSON parse:', text)
       if (typeof text !== 'string') throw new Error('Gemini API did not return a string')
       if (text) aiJson = JSON.parse(text)
     } catch (e: any) {

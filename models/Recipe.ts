@@ -1,5 +1,7 @@
 import mongoose, { Schema, models, model, Model } from 'mongoose'
 
+export type Difficulty = 'Easy' | 'Medium' | 'Hard'
+
 export interface IIngredient {
   name: string
   quantity?: string
@@ -19,6 +21,10 @@ export interface IRecipe extends mongoose.Document {
   imageUrl?: string
   youtubeUrl?: string
   sourceUrl?: string
+  prepTime?: number
+  cookTime?: number
+  servings?: number
+  difficulty?: Difficulty
   createdAt: Date
   updatedAt: Date
 }
@@ -42,6 +48,10 @@ const RecipeSchema = new Schema<IRecipe>({
   imageUrl: { type: String },
   youtubeUrl: { type: String },
   sourceUrl: { type: String },
+  prepTime: { type: Number, min: 0 },
+  cookTime: { type: Number, min: 0 },
+  servings: { type: Number, min: 1 },
+  difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'] as const },
 }, { timestamps: true })
 
 const RecipeModel: Model<IRecipe> = (models.Recipe as Model<IRecipe>) || model<IRecipe>('Recipe', RecipeSchema)
