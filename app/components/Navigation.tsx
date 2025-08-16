@@ -35,10 +35,9 @@ const Navigation = ({ activeTab: propActive, setActiveTab: propSetActive }: Navi
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'ai', label: 'AI Discovery', icon: Sparkles },
-    { id: 'plan', label: 'Meal Plan', icon: Target },
+    { id: 'plan', label: 'Plan', icon: Target },
     { id: 'recipes', label: 'Recipes', icon: BookOpen },
-    { id: 'shakes', label: 'Protein Shakes', icon: ChefHat },
-    { id: 'stats', label: 'Analytics', icon: TrendingUp },
+    { id: 'shakes', label: 'Shakes', icon: ChefHat },
   ]
 
   // Derive active tab from route when props not provided

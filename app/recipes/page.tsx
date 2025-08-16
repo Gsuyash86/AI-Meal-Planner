@@ -420,9 +420,9 @@ export default function RecipesPage() {
         ) : (
           <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {recipes.map((r) => (
-              <li key={r._id} className="card p-5">
+              <li key={r._id} className="card p-5 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push(`/recipes/${r._id}`)}>
                 <h3 className="text-lg font-medium mb-1">{r.title}</h3>
-                {r.description && <p className="text-text-secondary text-sm mb-2">{r.description}</p>}
+                {r.description && <p className="text-text-secondary text-sm mb-2 line-clamp-2">{r.description}</p>}
                 {typeof r.calories === 'number' && (
                   <p className="text-xs text-text-tertiary">{r.calories} kcal</p>
                 )}
@@ -433,15 +433,14 @@ export default function RecipesPage() {
                 </div>
                 {r.ingredients && r.ingredients.length > 0 && (
                   <ul className="mt-3 text-sm list-disc list-inside text-text-secondary space-y-0.5">
-                    {r.ingredients.map((ing, idx) => (
-                      <li key={idx}>{ing.name}{ing.quantity ? ` — ${ing.quantity}` : ''}</li>
+                    {r.ingredients.slice(0, 3).map((ing, idx) => (
+                      <li key={idx} className="truncate">{ing.name}{ing.quantity ? ` — ${ing.quantity}` : ''}</li>
                     ))}
+                    {r.ingredients.length > 3 && (
+                      <li className="text-cred-cyan">+{r.ingredients.length - 3} more ingredients</li>
+                    )}
                   </ul>
                 )}
-                <div className="mt-4 flex gap-2">
-                  <button className="btn btn-ghost" onClick={() => beginEdit(r)} aria-label={`Edit ${r.title}`}>Edit</button>
-                  <button className="btn btn-danger" onClick={() => deleteRecipe(r._id)} aria-label={`Delete ${r.title}`}>Delete</button>
-                </div>
               </li>
             ))}
           </ul>
