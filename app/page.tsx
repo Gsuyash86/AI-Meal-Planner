@@ -165,7 +165,7 @@ export default function Home() {
                 <Hero setActiveTab={handleTabChange} />
                 
                 {/* Quick Actions */}
-                <section className="mt-12">
+                {/* <section className="mt-12">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold">Quick Actions</h2>
                     <button 
@@ -200,7 +200,7 @@ export default function Home() {
                       </motion.button>
                     ))}
                   </div>
-                </section>
+                </section> */}
                 
                 {/* Today's Meals */}
                 <section className="mt-16">
