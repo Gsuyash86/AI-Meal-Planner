@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+
+type TabType = 'home' | 'meals' | 'recipes' | 'shakes' | 'stats'
+
 import { 
   Search, 
   Sparkles, 
@@ -74,7 +77,7 @@ const nutritionGoals = [
 ]
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('home')
+  const [activeTab, setActiveTab] = useState<TabType>('home')
   const [mounted, setMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [currentDate] = useState(new Date())
@@ -85,8 +88,11 @@ export default function Home() {
     const timer = setTimeout(() => setIsLoading(false), 1000)
     return () => clearTimeout(timer)
   }, [])
+  
+  // Fix TypeScript comparison issue
+  const isMealsActive = activeTab === 'meals'
 
-  const handleTabChange = (tab: string) => {
+  const handleTabChange = (tab: TabType) => {
     if (tab === activeTab) return
     
     setIsLoading(true)
@@ -102,13 +108,18 @@ export default function Home() {
   if (!mounted) return <LoadingSpinner />
 
   const renderContent = () => {
+    const quickActions = [
+      { icon: <Search size={20} />, label: 'Search Meals', tab: 'meals' as TabType },
+      { icon: <Sparkles size={20} />, label: 'Generate Plan', tab: 'home' as TabType },
+      { icon: <ChefHat size={20} />, label: 'My Recipes', tab: 'recipes' as TabType },
+      { icon: <Target size={20} />, label: 'Goals', tab: 'stats' as TabType },
+    ]
+
     switch (activeTab) {
       case 'home':
         return <Hero setActiveTab={handleTabChange} />
-      case 'search':
+      case 'meals':
         return <MealSearch />
-      case 'plan':
-        return <MealPlan />
       case 'recipes':
         return <Recipes />
       case 'shakes':
@@ -165,8 +176,12 @@ export default function Home() {
                 <section className="mt-12">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold">Quick Actions</h2>
-                    <button className="text-cred-purple hover:underline flex items-center text-sm font-medium">
-                      See all <ChevronRight size={16} className="ml-1" />
+                    <button 
+                      className="text-cred-purple hover:underline flex items-center text-sm font-medium"
+                      title="View all quick actions"
+                      aria-label="View all quick actions"
+                    >
+                      See all <ChevronRight size={16} className="ml-1" aria-hidden="true" />
                     </button>
                   </div>
                   
@@ -182,6 +197,8 @@ export default function Home() {
                         className={`bg-gradient-to-br ${item.color} rounded-2xl p-6 text-left text-white group`}
                         whileHover={{ y: -5, scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
+                        title={item.label}
+                        aria-label={item.label}
                       >
                         <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-white/30 transition-colors">
                           <item.icon className="text-white" size={20} />
@@ -198,11 +215,14 @@ export default function Home() {
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold">Today's Meals</h2>
                     <button 
-                      className="btn btn-primary flex items-center gap-2"
-                      onClick={() => handleTabChange('plan')}
+                      className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${isMealsActive ? 'bg-cred-pink/20 text-cred-pink' : 'text-text-secondary hover:bg-dark-hover'}`}
+                      onClick={() => setActiveTab('meals')}
+                      title="View and manage your meals"
+                      aria-label="View and manage your meals"
+                      aria-current={isMealsActive ? 'page' : undefined}
                     >
-                      <Plus size={18} />
-                      Add Meal
+<Plus size={18} aria-hidden="true" />
+                      <span>Add Meal</span>
                     </button>
                   </div>
                   
@@ -214,10 +234,15 @@ export default function Home() {
                         whileHover={{ y: -5 }}
                       >
                         <div className="absolute top-4 right-4 z-10">
-                          <button className="p-1.5 rounded-lg bg-dark-card/80 backdrop-blur-sm hover:bg-dark-hover">
+                          <button 
+                            className="p-1.5 rounded-lg bg-dark-card/80 backdrop-blur-sm hover:bg-dark-hover"
+                            title={meal.saved ? 'Remove from saved' : 'Save for later'}
+                            aria-label={meal.saved ? 'Remove from saved' : 'Save for later'}
+                          >
                             <Star 
                               size={18} 
-                              className={meal.saved ? 'text-yellow-400 fill-yellow-400' : 'text-text-secondary'} 
+                              className={meal.saved ? 'text-yellow-400 fill-yellow-400' : 'text-text-secondary'}
+                              aria-hidden="true"
                             />
                           </button>
                         </div>
@@ -249,9 +274,13 @@ export default function Home() {
                           </div>
                         </div>
                         
-                        <button className="w-full py-2.5 px-4 rounded-lg bg-cred-purple/10 text-cred-purple hover:bg-cred-purple/20 transition-colors text-sm font-medium flex items-center justify-center gap-2">
+                        <button 
+                          className="w-full py-2.5 px-4 rounded-lg bg-cred-purple/10 text-cred-purple hover:bg-cred-purple/20 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                          title={`View details for ${meal.name}`}
+                          aria-label={`View details for ${meal.name}`}
+                        >
                           View Details
-                          <ArrowUpRight size={16} />
+                          <ArrowUpRight size={16} aria-hidden="true" />
                         </button>
                       </motion.div>
                     ))}
@@ -271,7 +300,13 @@ export default function Home() {
                         </p>
                       </div>
                       <div className="mt-4 md:mt-0">
-                        <select className="bg-dark-card border border-dark-border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cred-purple/50 focus:border-transparent">
+                        <select 
+                          className="bg-dark-card border border-dark-border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cred-pink/50"
+                          value={activeTab}
+                          onChange={(e) => setActiveTab(e.target.value as TabType)}
+                          aria-label="Select view type"
+                          title="Select view type"
+                        >
                           <option>Today</option>
                           <option>This Week</option>
                           <option>This Month</option>

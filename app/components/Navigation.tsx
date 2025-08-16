@@ -118,10 +118,19 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
                 <Settings size={20} />
               </motion.button>
               
-              <motion.div className="relative">
+              <motion.div 
+                className="relative"
+              >
                 <button 
-                  className="flex items-center space-x-2 p-1.5 rounded-xl hover:bg-dark-hover transition-colors"
+                  type="button"
+                  className="flex items-center gap-2 text-text-secondary hover:text-white transition-colors"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  aria-label="User profile menu"
+                  aria-haspopup="true"
+                  aria-expanded={isProfileOpen ? 'true' : 'false'}
+                  aria-controls="profile-menu"
+                  id="profile-menu-button"
+                  title="Open profile menu"
                 >
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cred-purple to-cred-pink flex items-center justify-center text-white">
                     <UserCircle size={20} />
@@ -131,6 +140,7 @@ const Navigation = ({ activeTab, setActiveTab }: NavigationProps) => {
                 <AnimatePresence>
                   {isProfileOpen && (
                     <motion.div 
+                      id="profile-menu"
                       className="absolute right-0 mt-2 w-48 bg-dark-card border border-dark-border rounded-xl shadow-xl overflow-hidden"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}

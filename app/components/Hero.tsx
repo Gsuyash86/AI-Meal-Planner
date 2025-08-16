@@ -71,7 +71,9 @@ const Hero = ({ setActiveTab }: HeroProps) => {
         >
           <button 
             onClick={() => setActiveTab('search')}
-            className="cred-button flex items-center space-x-2"
+            className="btn btn-primary"
+            aria-label="Start AI search"
+            title="Start AI search"
           >
             <Search size={20} />
             <span>Start AI Search</span>
@@ -79,7 +81,9 @@ const Hero = ({ setActiveTab }: HeroProps) => {
           </button>
           <button 
             onClick={() => setActiveTab('plan')}
-            className="px-6 py-3 rounded-xl border border-dark-border text-white hover:border-cred-purple/50 transition-all duration-300 flex items-center space-x-2"
+            className="btn btn-outline"
+            aria-label="View meal plans"
+            title="View meal plans"
           >
             <Target size={20} />
             <span>View Meal Plans</span>
