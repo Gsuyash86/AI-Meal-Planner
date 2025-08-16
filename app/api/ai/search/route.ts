@@ -9,7 +9,7 @@ class GeminiClient {
   constructor(private apiKey: string, private model = process.env.GEMINI_MODEL || 'gemini-1.5-flash') {}
 
   async searchMeals(query: string): Promise<any[]> {
-    const prompt = `Generate 3 meal based on real sources, verified sources, verified recipe with youtube url and source url and verified image url: ${query}. For each meal, return JSON with:
+    const prompt = `Generate 3 meal based on real sources, verified sources, verified recipe with youtube url and verified image url: ${query}. For each meal, return JSON with:
     - name: string (creative meal name)
     - description: string (1-2 sentences)
     - calories: number
@@ -59,8 +59,8 @@ class GeminiClient {
       }
 
       const data = await res.json()
-      console.log('Gemini raw response:', JSON.stringify(data, null, 2))
-      
+    //   console.log('Gemini raw response:', JSON.stringify(data, null, 2))
+      console.dir(data, { depth : null});
       // Extract text from response
       let text = data?.candidates?.[0]?.content?.parts?.[0]?.text
       
