@@ -154,7 +154,7 @@ export async function POST(req: Request) {
       "youtubeUrl": string | null,
       "sourceUrl": string | null
     }`;
-    const prompt = `${task}\n${format}\nRules:\n- If numeric macros unknown, use null.\n- Prefer concise steps.\n- imageUrl should be a representative image if available.`
+    const prompt = `${task}\n${format}\nRules:\n- Recipe must have macros and verified source.\n- Prefer concise steps.\n- imageUrl should be a representative image if available.`
 
     if (!GEMINI_API_KEY) {
       return NextResponse.json({ error: sourceUrl ? 'Could not parse recipe from URL and no AI key configured.' : 'Provide GEMINI_API_KEY or a recipe URL.' }, { status: 400 })

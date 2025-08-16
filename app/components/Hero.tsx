@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { 
   Sparkles, 
   Search, 
@@ -35,6 +36,8 @@ const Hero = ({ setActiveTab }: HeroProps) => {
       }
     }
   }
+
+  const router = useRouter();
 
   return (
     <motion.section 
@@ -74,7 +77,7 @@ const Hero = ({ setActiveTab }: HeroProps) => {
           variants={fadeInUp}
         >
           <button 
-            onClick={() => setActiveTab('search')}
+            onClick={() => router.push('/ai')}
             className="btn btn-primary"
             aria-label="Start AI search"
             title="Start AI search"
@@ -84,7 +87,7 @@ const Hero = ({ setActiveTab }: HeroProps) => {
             <ArrowRight size={20} />
           </button>
           <button 
-            onClick={() => setActiveTab('plan')}
+            onClick={() => router.push('/meal-plan')}
             className="btn btn-outline"
             aria-label="View meal plans"
             title="View meal plans"

@@ -203,7 +203,7 @@ export default function Home() {
                 </section> */}
                 
                 {/* Today's Meals */}
-                <section className="mt-16">
+                {/* <section className="mt-16">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold">Today's Meals</h2>
                     <button 
@@ -277,10 +277,10 @@ export default function Home() {
                       </motion.div>
                     ))}
                   </div>
-                </section>
+                </section> */}
                 
                 {/* Nutrition Overview */}
-                <section className="mt-16 mb-20">
+                {/* <section className="mt-16 mb-20">
                   <h2 className="text-2xl font-bold mb-6">Today's Nutrition</h2>
                   
                   <div className="card p-6">
@@ -351,7 +351,7 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                </section>
+                </section> */}
               </div>
             ) : (
               <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
